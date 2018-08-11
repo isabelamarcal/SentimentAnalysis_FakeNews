@@ -11,15 +11,38 @@ import re
 import unicodedata
 import tkinter as tk
 from tkinter import filedialog
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+nltk.download('stopwords')
 
 file_opt={}
 
+#Tokenização do campo "informação", removendo stopwords
+def tokenize_info(info):
+    
+    stopWords = set(stopwords.words('english'))
+    words = word_tokenize(info)
+    wordsFiltered = []
+    
+    for w in words:
+        if w not in stopWords:
+            wordsFiltered.append(w)
+            
+    info_tokenized = ""
+    
+    for w in words:
+        if w not in stopWords:
+            info_tokenized = info_tokenized + " " + w
+    
+    return info_tokenized
+
 #Criação do arquivo Json filtrado e normalizado
-def create_normalized_Json(title,author,info,url):
+def create_normalized_Json(title,author,info_tokenized,url):
     
     name_arq = filedialog.asksaveasfilename(**file_opt)
     arq = open(name_arq,'w')
-    data = {'title':title,'author':author,'information':info,'url':url}
+    data = {'title':title,'author':author,'information':info_tokenized,'url':url}
     json.dump(data,arq) 
     arq.close()
     return 
@@ -57,11 +80,14 @@ def read_Json():
     
     info = normalization(info)
     info = stripNonAlphaNum(info)    
-    create_normalized_Json(title,author,info,url)
+
+    info_tokenized = tokenize_info(info)
+
+    create_normalized_Json(title,author,info_tokenized,url)
     
     print('Title: ',title)
     print('Author name: ',author)
-    print('Information: ',info)
+    print('Information: ',info_tokenized)
     print('Url: ',url)
 
 """
