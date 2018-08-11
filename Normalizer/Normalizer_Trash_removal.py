@@ -11,10 +11,6 @@ import re
 import unicodedata
 import tkinter as tk
 from tkinter import filedialog
-import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-nltk.download('stopwords')
 
 file_opt={}
 
