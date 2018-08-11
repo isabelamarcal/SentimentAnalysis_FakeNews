@@ -1,43 +1,34 @@
-import tweepy
-import csv
-import time
-import io
+from nltk.tokenize import word_tokenize
+import nltk
+from nltk.metrics.spearman import *
+from nltk.collocations import *
+nltk.download('punkt')
+#from tokenize import tokenize, untokenize, NUMBER, STRING, NAME, OP
+
+text = "claims democratic candidate " \
+       " governor matt  turned flynn told one child predator " \
+       " wait see turned authorities"
+
+tokens = word_tokenize(text)
+freq = nltk.FreqDist(tokens)
+freq.plot(2)
+sortDict = sorted(freq, key=lambda x: (-freq[x], x))
+
+#não - direcionado
+print('Não-Direcionado:')
+for key in sortDict:
+    print(key, freq[key])
+
+#comprimento medio palavras
+
+print('Cumprimento medio das palavras:')
+mediumLen = text.replace(" ","").__len__()/tokens.__len__()
+print(mediumLen)
 
 
-consumer_key="WTgSL7NnMFWDLUki7CLgLC0BA"
-consumer_secret="sH6RHK10SqQ12K451lM0tB6gtU7R88rUoVx15ecigkAHuWDcOS"
-access_token="53950516-gHdCP9U3d9joMzZqxOJpbAKQwhcVE6kuqViBwqLJp"
-access_token_secret="oPhp4ZGXzBliAZN8kk4UOzkEC9EstK51rGMnrZUVW0yzB"
-
-auth = tweepy.OAuthHandler(consumer_key,consumer_secret)
-auth.set_access_token(access_token,access_token_secret)
-
-api = tweepy.API(auth)
-
-arq = csv.writer(open("base_teste.csv","w", encoding="utf-8"))
-arq2 = io.open("base_teste_json.json","w", encoding="utf-8")
-
-row = []
-
-statuses = tweepy.Cursor(api.search, q='politica', since='2018-06-01', until='2018-06-03', lang='pt').items()
 
 
-while True:
-    try:
-        status = statuses.next()
-        row = str(status.user.screen_name),str(status.created_at),str(status.text)
 
-        arq.writerow(row)
-        arq2.write(str(status))
-        arq2.write("\n")
-        exit()
 
-    except tweepy.TweepError:
-        print('wait 15 min')
-        time.sleep(60*15)
-        continue
-    except StopIteration:
-        print('acabou é hexa')
-        break
 
 
