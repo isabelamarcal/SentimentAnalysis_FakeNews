@@ -118,7 +118,7 @@ Informations:
 # lemos o JSON em disco
 #Main function
 
-read_Json()
+#read_Json()
     
         
         
