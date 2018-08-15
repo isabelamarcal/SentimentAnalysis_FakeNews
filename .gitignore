@@ -40,3 +40,12 @@ tmtagsHistory
 *.sublime-project
 *.sublime-workspace
 .bundle
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
