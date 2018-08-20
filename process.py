@@ -16,4 +16,6 @@ info_tokenized = normalizer.tokenize_info(info)
 #rankeia e plota
 distToPlot =  {}
 distToPlot = rank.freqDist(info_tokenized)
+
 distToPlot.plot(20)
+
