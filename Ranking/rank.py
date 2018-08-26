@@ -12,14 +12,14 @@ def freqDist(text):
     # for sent in sentences:
     #     print(nltk.pos_tag(nltk.word_tokenize(sent)))
     ps = SnowballStemmer("english")
-
+    print ('stemm')
     text = text.replace("said","say")
     tokens = word_tokenize(text)
 
 
     tokens[:] = [ps.stem(word) for word in tokens]
 
-
+    print ('freq')
     freq = nltk.FreqDist(tokens)
     # sort_dict = sorted(freq, key=lambda x: (-freq[x], x))
     # wordCount = tokens.__len__()
