@@ -1,6 +1,6 @@
 import Normalizer.Normalizer_Trash_removal as normalizer
 import Ranking.rank as rank
-import Source_Analyzes.analize as aSource
+import Source_Analyze.analize as aSource
 from sklearn import svm
 import numpy as np
 import  json
@@ -84,7 +84,7 @@ data_json = json.loads(jsonStr)
 
 X_train = []
 for registry in data_json:
-    #aSource.analizesSource(registry)
+    aSource.analizeSource(registry['url'])    
     wordCount = rank.get_key_words_count(registry['text']+registry['title'], words_to_rank)
     print ("append ", wordCount)
     X_train.append(np.asarray(wordCount))
