@@ -93,7 +93,7 @@ for registry in data_json:
     registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
 
     registry['text'] = normalizer.normalization(registry['text'])
-    registry['text'] = normalizer.tokenize_info(info)
+    registry['text'] = normalizer.tokenize_info(registry['text'])
     registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
 
     wordCount = rank.get_key_words_count(registry['text']+registry['title'], words_to_rank)
@@ -121,7 +121,7 @@ for registry in data_json:
     registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
 
     registry['text'] = normalizer.normalization(registry['text'])
-    registry['text'] = normalizer.tokenize_info(info)
+    registry['text'] = normalizer.tokenize_info(registry['text'])
     registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
 
     wordCount = rank.get_key_words_count(registry['text'],
