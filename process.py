@@ -1,6 +1,7 @@
 import Normalizer.Normalizer_Trash_removal as normalizer
 import Ranking.rank as rank
 import Source_Analyze.analize as aSource
+import Sentiment_Analysis.SentimentAnalysis as sentimentAnalysis
 from sklearn import svm
 import numpy as np
 import  json
@@ -84,8 +85,21 @@ data_json = json.loads(jsonStr)
 
 X_train = []
 for registry in data_json:
+
+    sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+
+    registry['title'] = normalizer.normalization(registry['title'])
+    registry['title'] = normalizer.tokenize_info(registry['title'])
+    registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+
+    registry['text'] = normalizer.normalization(registry['text'])
+    registry['text'] = normalizer.tokenize_info(info)
+    registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+
     wordCount = rank.get_key_words_count(registry['text']+registry['title'], words_to_rank)
-    wordCount.append(aSource.analizeSource(registry['url']))
+
+    wordCount.append(sentiment)
+    #wordCount.append(aSource.analizeSource(registry['url']))
     print ("appending.. ")
     X_train.append(np.asarray(wordCount))
 clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.1)
@@ -99,16 +113,29 @@ correct=0
 for registry in data_json:
     count = count+1
     test = []
+
+    sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+
+    registry['title'] = normalizer.normalization(registry['title'])
+    registry['title'] = normalizer.tokenize_info(registry['title'])
+    registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+
+    registry['text'] = normalizer.normalization(registry['text'])
+    registry['text'] = normalizer.tokenize_info(info)
+    registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+
     wordCount = rank.get_key_words_count(registry['text'],
                                          words_to_rank)
-    wordCount.append(aSource.analizeSource(registry['url']))
+    #wordCount.append(aSource.analizeSource(registry['url']))
+    wordCount.append(sentiment)
+
     test.append(np.asarray(wordCount))
     result = clf.predict(test)
     if result[0]<0:
-        print ('seems false.')
+        print ('isso é caô.')
         correct = correct+1
     else:
-        print ('seems true.(wrong)')
+        print ('não parece mas é caô')
 
 print ('accuracy', correct/count)
 
