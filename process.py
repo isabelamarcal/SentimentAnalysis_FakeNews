@@ -84,9 +84,9 @@ data_json = json.loads(jsonStr)
 
 X_train = []
 for registry in data_json:
-    aSource.analizeSource(registry['url'])    
     wordCount = rank.get_key_words_count(registry['text']+registry['title'], words_to_rank)
-    print ("append ", wordCount)
+    wordCount.append(aSource.analizeSource(registry['url']))
+    print ("appending.. ")
     X_train.append(np.asarray(wordCount))
 clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.1)
 clf.fit(X_train)
@@ -101,6 +101,7 @@ for registry in data_json:
     test = []
     wordCount = rank.get_key_words_count(registry['text'],
                                          words_to_rank)
+    wordCount.append(aSource.analizeSource(registry['url']))
     test.append(np.asarray(wordCount))
     result = clf.predict(test)
     if result[0]<0:

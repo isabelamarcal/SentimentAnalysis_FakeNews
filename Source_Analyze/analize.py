@@ -44,16 +44,16 @@ def analizeSource(data):
     else: 
         trustworthiness_1 = trustworthiness_2 = 0
 
-    print("============================================================================")
+    #print("============================================================================")
     # print (res.text) 
     # print (trustworthiness_1)
     # print (trustworthiness_2) 
     if trustworthiness_1 < 50 :
         # if trustworthiness_2 < 50 :
-            print('unreliable') 
+            return  0
     if trustworthiness_1 >= 50 :
         # if trustworthiness_2 > 50 :
-            print('trustworthy') 
+            return 1
     # print("======================================FONTE======================================")
     # print('\n')
 
