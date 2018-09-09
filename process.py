@@ -126,7 +126,7 @@ for registry in data_json:
 
     wordCount = rank.get_key_words_count(registry['text'],
                                          words_to_rank)
-    #wordCount.append(aSource.analizeSource(registry['url']))
+    wordCount.append(aSource.analizeSource(registry['url']))
     wordCount.append(sentiment)
 
     test.append(np.asarray(wordCount))
