@@ -24,7 +24,7 @@ def analizeSource(data):
     data_json = json.loads(arq)
 
     for registry in data_json:
-        if registry['url'] && registry['url'] == url :
+        if registry['url'] and registry['url'] == url :
             return registry['trustworthiness']
             
     # Corpo da requisição GET

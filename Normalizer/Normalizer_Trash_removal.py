@@ -27,6 +27,8 @@ def tokenize_info(info):
     
     for w in words:
         if w not in stopWords:
+            if w == "nt":
+                w = "not" ;
             wordsFiltered.append(w)
             
     info_tokenized = ""
