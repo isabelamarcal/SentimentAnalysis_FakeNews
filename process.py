@@ -30,7 +30,7 @@ def rank_text():
     # rankeia e plota
     distToPlot = rank.freqDist(allText)
 
-    #distToPlot.plot(1900)
+    #distToPlot.plot(3000)
     file_opt={}
     name_arq = filedialog.asksaveasfilename(**file_opt)
     arq = open(name_arq,'w')
@@ -59,59 +59,65 @@ inputPath = filedialog.askopenfilename()
 jsonStr = open(inputPath).read()
 data_json = json.loads(jsonStr)
 
-X_train = []
-for registry in data_json:
 
-    #sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+inputPathTest = filedialog.askopenfilename()
+jsonStrTest = open(inputPathTest).read()
+data_jsonTest = json.loads(jsonStrTest)
 
-    registry['title'] = normalizer.normalization(registry['title'])
-    registry['title'] = normalizer.tokenize_info(registry['title'])
-    registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+#print ('tudo: ', len(words_to_rank))
+tests = [12,25,50,62,75,100,125,150,175,200,225,250,275,300,325,350,375,400,750,1500,2250,3000,3750,4500,5250,6000,6750,7500,8250,9000,9750,10500,11250,12000,12750,13500,14250,15000,
+         15750,16500,17250,18000,18750,19500,20250,21000,21750]
 
-    registry['text'] = normalizer.normalization(registry['text'])
-    registry['text'] = normalizer.tokenize_info(registry['text'])
-    registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+first = [1,2]
+for number in tests:
+    X_train = []
+    for registry in data_json:
 
-    wordCount = rank.get_key_words_count(registry['text']+registry['title']+registry['title'], words_to_rank[:1900])
+#        sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
 
-    #wordCount.append(sentiment)
-    #wordCount.append(aSource.analizeSource(registry['url']))
-    print ("appending.. ")
-    X_train.append(np.asarray(wordCount))
-clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.1)
-clf.fit(X_train)
+        registry['title'] = normalizer.normalization(registry['title'])
+        registry['title'] = normalizer.tokenize_info(registry['title'])
+        registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
 
-inputPath = filedialog.askopenfilename()
-jsonStr = open(inputPath).read()
-data_json = json.loads(jsonStr)
-count = 0
-correct=0
-for registry in data_json:
-    count = count+1
-    test = []
+        registry['text'] = normalizer.normalization(registry['text'])
+        registry['text'] = normalizer.tokenize_info(registry['text'])
+        registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
 
-    #sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+        wordCount = rank.get_key_words_count(registry['text']+registry['title']+registry['title'], words_to_rank[:number])
 
-    registry['title'] = normalizer.normalization(registry['title'])
-    registry['title'] = normalizer.tokenize_info(registry['title'])
-    registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+        # wordCount.append(sentiment)
+        # wordCount.append(aSource.analizeSource(registry['url']))
+        # #print ("appending.. ")
+        X_train.append(np.asarray(wordCount))
+    clf = svm.OneClassSVM( kernel="poly")
+    clf.fit(X_train)
 
-    registry['text'] = normalizer.normalization(registry['text'])
-    registry['text'] = normalizer.tokenize_info(registry['text'])
-    registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+    count = 0
+    correct=0
+    for registry in data_jsonTest:
+        count = count+1
+        test = []
 
-    wordCount = rank.get_key_words_count(registry['text']+registry['title']+registry['title'],
-                                         words_to_rank[:1900])
-    #wordCount.append(aSource.analizeSource(registry['url']))
-    #wordCount.append(sentiment)
+ #       sentimentTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
 
-    test.append(np.asarray(wordCount))
-    result = clf.predict(test)
-    if result[0]<0:
-        print ('isso é caô.')
-        correct = correct+1
-    else:
-        print ('não parece mas é caô')
+        registry['title'] = normalizer.normalization(registry['title'])
+        registry['title'] = normalizer.tokenize_info(registry['title'])
+        registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
 
-print ('accuracy', correct/count)
+        registry['text'] = normalizer.normalization(registry['text'])
+        registry['text'] = normalizer.tokenize_info(registry['text'])
+        registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+        wordCountTest = rank.get_key_words_count(registry['text']+registry['title']+registry['title'],
+                                             words_to_rank[:number])
+        # wordCountTest.append(aSource.analizeSource(registry['url']))
+        # wordCountTest.append(sentimentTest)
+
+        test.append(np.asarray(wordCountTest))
+        result = clf.predict(test)
+      #  print (result)
+        if result[0]<0:
+            #print ('isso é caô.')
+            correct = correct+1
+
+    print ('accuracy', number, ":", correct / count)
 

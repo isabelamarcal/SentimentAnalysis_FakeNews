@@ -2,6 +2,7 @@ import json
 import requests
 from tkinter import filedialog
 from urllib.parse import urlparse
+import os
 
 def analizeSource(data):
 
@@ -19,7 +20,11 @@ def analizeSource(data):
 
     target = '{uri.netloc}'.format(uri=o)
 
-    arq = open('allSources.txt','a').read()
+    script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
+    rel_path = 'allSources.txt'
+    abs_file_path = os.path.join(script_dir, rel_path)
+
+    arq = open(abs_file_path,'r+').read()
 
     data_json = json.loads(arq)
 
