@@ -68,56 +68,89 @@ data_jsonTest = json.loads(jsonStrTest)
 tests = [12,25,50,62,75,100,125,150,175,200,225,250,275,300,325,350,375,400,750,1500,2250,3000,3750,4500,5250,6000,6750,7500,8250,9000,9750,10500,11250,12000,12750,13500,14250,15000,
          15750,16500,17250,18000,18750,19500,20250,21000,21750]
 
+#gamma vai de 10^1 até 10^-6.
+#palavras variando de 10 em 10 até o número máximo de palavras que tem em uma noticia do dataset.
+
 first = [1,2]
-for number in tests:
-    X_train = []
-    for registry in data_json:
+# maior número de palavras de uma notícia
+sizeText = 3000
+# gamma inicial
+gam =  1
+while gam > 0.000001
+    number=10
+    accuracy = 0
+    maxWords = 0
+    gamAux = 0
+    while number < sizeText :
+        X_train = []
+        for registry in data_json:
 
-#        sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+            #sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
 
-        registry['title'] = normalizer.normalization(registry['title'])
-        registry['title'] = normalizer.tokenize_info(registry['title'])
-        registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+            registry['title'] = normalizer.normalization(registry['title'])
+            registry['title'] = normalizer.tokenize_info(registry['title'])
+            registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
 
-        registry['text'] = normalizer.normalization(registry['text'])
-        registry['text'] = normalizer.tokenize_info(registry['text'])
-        registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+            registry['text'] = normalizer.normalization(registry['text'])
+            registry['text'] = normalizer.tokenize_info(registry['text'])
+            registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
 
-        wordCount = rank.get_key_words_count(registry['text']+registry['title']+registry['title'], words_to_rank[:number])
+            wordCount = rank.get_key_words_count(registry['text']+registry['title']+registry['title'], words_to_rank[:number])
 
-        # wordCount.append(sentiment)
-        # wordCount.append(aSource.analizeSource(registry['url']))
-        # #print ("appending.. ")
-        X_train.append(np.asarray(wordCount))
-    clf = svm.OneClassSVM( kernel="poly")
-    clf.fit(X_train)
+            # print(len(registry['text'].split(" ")))
 
-    count = 0
-    correct=0
-    for registry in data_jsonTest:
-        count = count+1
-        test = []
+            # sizeText_Aux = len(registry['text'].split(" "))
 
- #       sentimentTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+            # if sizeText < sizeText_Aux :
+            #     sizeText = sizeText_Aux
 
-        registry['title'] = normalizer.normalization(registry['title'])
-        registry['title'] = normalizer.tokenize_info(registry['title'])
-        registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+            # wordCount.append(sentiment)
+            # wordCount.append(aSource.analizeSource(registry['url']))
+            # #print ("appending.. ")
+            X_train.append(np.asarray(wordCount))
+        
+        clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=gam)
+        clf.fit(X_train)
 
-        registry['text'] = normalizer.normalization(registry['text'])
-        registry['text'] = normalizer.tokenize_info(registry['text'])
-        registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
-        wordCountTest = rank.get_key_words_count(registry['text']+registry['title']+registry['title'],
-                                             words_to_rank[:number])
-        # wordCountTest.append(aSource.analizeSource(registry['url']))
-        # wordCountTest.append(sentimentTest)
+        count = 0
+        correct=0
 
-        test.append(np.asarray(wordCountTest))
-        result = clf.predict(test)
-      #  print (result)
-        if result[0]<0:
-            #print ('isso é caô.')
-            correct = correct+1
+        for registry in data_jsonTest:
+            count = count+1
+            test = []
 
-    print ('accuracy', number, ":", correct / count)
+            #sentimentTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
 
+            registry['title'] = normalizer.normalization(registry['title'])
+            registry['title'] = normalizer.tokenize_info(registry['title'])
+            registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+
+            registry['text'] = normalizer.normalization(registry['text'])
+            registry['text'] = normalizer.tokenize_info(registry['text'])
+            registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+            wordCountTest = rank.get_key_words_count(registry['text']+registry['title']+registry['title'],
+                                                words_to_rank[:number])
+            # wordCountTest.append(aSource.analizeSource(registry['url']))
+            # wordCountTest.append(sentimentTest)
+
+            test.append(np.asarray(wordCountTest))
+            result = clf.predict(test)
+            #print (result)
+            if result[0]<0:
+                #print ('isso é caô.')
+                correct = correct+1
+            # print('Maior Notícia: ', sizeText)
+        # print ('accuracy', number, ":", correct / count)
+        
+        accuracy_Aux = correct / count
+
+        if accuracy_Aux > accuracy:
+            accuracy = accuracy_Aux
+            maxWords = number
+            gamaAux  = gam            
+
+        number +=  10
+    print("Gamma = ", gam, "Acurracy = ", accuracy)
+    gam -= 0.25
+
+print('Final: Acuracia=',accuracy,' gamma=',gamaAux,' numero de palavras=',maxWords)
