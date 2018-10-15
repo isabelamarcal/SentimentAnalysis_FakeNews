@@ -82,27 +82,27 @@ while gam > 0.00001:
     fullTest = []
 
     for registry in data_json:
-        sentimentText = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
-        sentimentTitle = sentimentAnalysis.sentiment_value_per_paragraph(registry['title'])
-
-        registry['title'] = normalizer.normalization(registry['title'])
-        registry['title'] = normalizer.tokenize_info(registry['title'])
-        registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
-
-        registry['text'] = normalizer.normalization(registry['text'])
-        registry['text'] = normalizer.tokenize_info(registry['text'])
-        registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
-
-        wordCount = rank.get_key_words_count(registry['text'] + registry['title'] + registry['title'],
-                                             words_to_rank[:sizeText])
-
-        wordCount.append(aSource.analizeSource(registry['url']))
-
-        wordCount.append(sentimentText)
-        wordCount.append(sentimentTitle)
-
-
-        fullTrain.append(np.asarray(wordCount))
+        # sentimentText = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+        # sentimentTitle = sentimentAnalysis.sentiment_value_per_paragraph(registry['title'])
+        #
+        # registry['title'] = normalizer.normalization(registry['title'])
+        # registry['title'] = normalizer.tokenize_info(registry['title'])
+        # registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+        #
+        # registry['text'] = normalizer.normalization(registry['text'])
+        # registry['text'] = normalizer.tokenize_info(registry['text'])
+        # registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+        #
+        # wordCount = rank.get_key_words_count(registry['text'] + registry['title'] + registry['title'],
+        #                                      words_to_rank[:sizeText])
+        #
+        # wordCount.append(aSource.analizeSource(registry['url']))
+        #
+        # wordCount.append(sentimentText)
+        # wordCount.append(sentimentTitle)
+        #
+        #
+        # fullTrain.append(np.asarray(wordCount))
         # print(len(registry['text'].split(" ")))
 
         # sizeText_Aux = len(registry['text'].split(" "))
@@ -112,35 +112,43 @@ while gam > 0.00001:
 
         # wordCount.append(sentiment)
         # #print ("appending.. ")
+
+         fullTrain.append(np.asarray(registry))
+
     count = 0
     for registry in data_jsonTest:
         count = count + 1
 
 
-        sentimentTextTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
-        sentimentTitleTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['title'])
-
-        registry['title'] = normalizer.normalization(registry['title'])
-        registry['title'] = normalizer.tokenize_info(registry['title'])
-        registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
-
-        registry['text'] = normalizer.normalization(registry['text'])
-        registry['text'] = normalizer.tokenize_info(registry['text'])
-        registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
-        wordCountTest = rank.get_key_words_count(registry['text'] + registry['title'] + registry['title'],
-                                                 words_to_rank[:sizeText])
-
-        wordCountTest.append(aSource.analizeSource(registry['url']))
-        wordCountTest.append(sentimentTextTest)
-        wordCountTest.append(sentimentTitleTest)
-
-        fullTest.append(np.asarray(wordCountTest))
+        # sentimentTextTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+        # sentimentTitleTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['title'])
+        #
+        # registry['title'] = normalizer.normalization(registry['title'])
+        # registry['title'] = normalizer.tokenize_info(registry['title'])
+        # registry['title'] = normalizer.stripNonAlphaNum(registry['title'])
+        #
+        # registry['text'] = normalizer.normalization(registry['text'])
+        # registry['text'] = normalizer.tokenize_info(registry['text'])
+        # registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
+        # wordCountTest = rank.get_key_words_count(registry['text'] + registry['title'] + registry['title'],
+        #                                          words_to_rank[:sizeText])
+        #
+        # wordCountTest.append(aSource.analizeSource(registry['url']))
+        # wordCountTest.append(sentimentTextTest)
+        # wordCountTest.append(sentimentTitleTest)
+        #
+        # fullTest.append(np.asarray(wordCountTest))
+        fullTest.append(np.asarray(registry))
 
 
     while number < sizeText:
         X_train = []
 
         for x in fullTrain:
+            #AQUI FAZ O CONTROLE DO NUMERO DE PALAVRAS QUE ESTAO SENDO USADAS.
+            #ARMAZENAR OS "LASTS" DA ANALISE DE FONTE E DE SENTIMENTO
+            #EX: 3 ATRIBUTOS DE SENTIMENtO: 5 LAST1,LAST2,LAST3
+            #AI TIRA O NUMERO DE PALAVRAS QUE VAI USAR E JUNTA OS LASTS.
             last1 = x[-1]
             last2 = x[-2]
             last3 = x[-3]

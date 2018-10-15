@@ -2,7 +2,7 @@ import Normalizer.Normalizer_Trash_removal as normalizer
 import Ranking.rank as rank
 import Source_Analyze.analize as aSource
 import Sentiment_Analysis.SentimentAnalysis as sentimentAnalysis
-
+from textblob import TextBlob
 from sklearn import svm
 import numpy as np
 import  json
@@ -151,10 +151,23 @@ for registry in data_json:
 
     wordCount.append(aSource.analizeSource(registry['url']))
     print(sentimentTitle)
+    #sentimento do lntk
     wordCount.append(sentimentText)
     wordCount.append(sentimentTitle)
+
+    #contagem de emotionWords
     wordCount.append(rank.get_senti_words_count(registry['text']))
     wordCount.append(rank.get_senti_words_count(registry['title']))
+
+    #subjetividade e polaridade
+    testimonialTitle = TextBlob(registry['title'])
+    print(testimonialTitle.sentiment)
+    wordCount.append(testimonialTitle.sentiment.polarity)
+    wordCount.append(testimonialTitle.sentiment.subjectivity)
+    testimonialText = TextBlob(registry['text'])
+    print(testimonialText.sentiment)
+    wordCount.append(testimonialText.sentiment.polarity)
+    wordCount.append(testimonialText.sentiment.subjectivity)
 
 
     fullTrain.append(np.asarray(wordCount))
