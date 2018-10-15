@@ -31,7 +31,7 @@ def freqDist(text):
     #     if percent > 0.2:
     #         print(key + ":"+str(percent)+"%")
 
-    return sort_dict
+    return freq
 
 def get_key_words_count(text,words):
     ps = SnowballStemmer("english")

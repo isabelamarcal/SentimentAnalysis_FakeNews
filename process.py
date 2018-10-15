@@ -68,12 +68,22 @@ data_jsonTest = json.loads(jsonStrTest)
 tests = [12,25,50,62,75,100,125,150,175,200,225,250,275,300,325,350,375,400,750,1500,2250,3000,3750,4500,5250,6000,6750,7500,8250,9000,9750,10500,11250,12000,12750,13500,14250,15000,
          15750,16500,17250,18000,18750,19500,20250,21000,21750]
 
-first = [1,2]
-for number in tests:
-    X_train = []
-    for registry in data_json:
+first = [1, 2]
+# maior número de palavras de uma notícia
+sizeText = 1000
+# gamma inicial
+gam = 1
+while gam > 0.00001:
+    number = 10
+    accuracy = 0
+    maxWords = 0
+    gamAux = 0
+    fullTrain = []
+    fullTest = []
 
-#        sentiment = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+    for registry in data_json:
+        sentimentText = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+        sentimentTitle = sentimentAnalysis.sentiment_value_per_paragraph(registry['title'])
 
         registry['title'] = normalizer.normalization(registry['title'])
         registry['title'] = normalizer.tokenize_info(registry['title'])
@@ -83,22 +93,32 @@ for number in tests:
         registry['text'] = normalizer.tokenize_info(registry['text'])
         registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
 
-        wordCount = rank.get_key_words_count(registry['text']+registry['title']+registry['title'], words_to_rank[:number])
+        wordCount = rank.get_key_words_count(registry['text'] + registry['title'] + registry['title'],
+                                             words_to_rank[:sizeText])
+
+        wordCount.append(aSource.analizeSource(registry['url']))
+
+        wordCount.append(sentimentText)
+        wordCount.append(sentimentTitle)
+
+
+        fullTrain.append(np.asarray(wordCount))
+        # print(len(registry['text'].split(" ")))
+
+        # sizeText_Aux = len(registry['text'].split(" "))
+
+        # if sizeText < sizeText_Aux :
+        #     sizeText = sizeText_Aux
 
         # wordCount.append(sentiment)
-        # wordCount.append(aSource.analizeSource(registry['url']))
         # #print ("appending.. ")
-        X_train.append(np.asarray(wordCount))
-    clf = svm.OneClassSVM( kernel="poly")
-    clf.fit(X_train)
-
     count = 0
-    correct=0
     for registry in data_jsonTest:
-        count = count+1
-        test = []
+        count = count + 1
 
- #       sentimentTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+
+        sentimentTextTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['text'])
+        sentimentTitleTest = sentimentAnalysis.sentiment_value_per_paragraph(registry['title'])
 
         registry['title'] = normalizer.normalization(registry['title'])
         registry['title'] = normalizer.tokenize_info(registry['title'])
@@ -107,17 +127,63 @@ for number in tests:
         registry['text'] = normalizer.normalization(registry['text'])
         registry['text'] = normalizer.tokenize_info(registry['text'])
         registry['text'] = normalizer.stripNonAlphaNum(registry['text'])
-        wordCountTest = rank.get_key_words_count(registry['text']+registry['title']+registry['title'],
-                                             words_to_rank[:number])
-        # wordCountTest.append(aSource.analizeSource(registry['url']))
-        # wordCountTest.append(sentimentTest)
+        wordCountTest = rank.get_key_words_count(registry['text'] + registry['title'] + registry['title'],
+                                                 words_to_rank[:sizeText])
 
-        test.append(np.asarray(wordCountTest))
-        result = clf.predict(test)
-      #  print (result)
-        if result[0]<0:
-            #print ('isso é caô.')
-            correct = correct+1
+        wordCountTest.append(aSource.analizeSource(registry['url']))
+        wordCountTest.append(sentimentTextTest)
+        wordCountTest.append(sentimentTitleTest)
 
-    print ('accuracy', number, ":", correct / count)
+        fullTest.append(np.asarray(wordCountTest))
 
+
+    while number < sizeText:
+        X_train = []
+
+        for x in fullTrain:
+            last1 = x[-1]
+            last2 = x[-2]
+            last3 = x[-3]
+
+            toAppend = x[:number]
+            toAppend.append(last1)
+            toAppend.append(last2)
+            toAppend.append(last3)
+
+            X_train.append(np.asarray(toAppend))
+
+        clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=gam)
+        clf.fit(X_train)
+
+        count = 0
+        correct = 0
+
+        for y in fullTest:
+            count = count+1
+            test = []
+            lastTest = y[-1]
+            toAppendTest = y[:number]
+            toAppendTest.append(lastTest)
+            test.append(np.asarray(toAppendTest))
+            result = clf.predict(test)
+            # print (result)
+            if result[0] < 0:
+                # print ('isso é caô.')
+                correct = correct + 1
+            # print('Maior Notícia: ', sizeText)
+        # print ('accuracy', number, ":", correct / count)
+
+        accuracy = correct / count
+
+     #   if accuracy_Aux > accuracy:
+     #       accuracy = accuracy_Aux
+     #       maxWords = number
+     #       gamaAux = gam
+
+        print("number = ",number,", Gamma = ", gam, ", Acurracy = ", accuracy)
+
+        number += 10
+
+    gam = gam/10
+
+#print('Final: Acuracia=', accuracy, ' gamma=', gamaAux, ' numero de palavras=', maxWords)
