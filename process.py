@@ -70,7 +70,7 @@ tests = [12,25,50,62,75,100,125,150,175,200,225,250,275,300,325,350,375,400,750,
 
 first = [1, 2]
 # maior número de palavras de uma notícia
-sizeText = 1000
+sizeText = 11
 # gamma inicial
 gam = 1
 while gam > 0.00001:
@@ -152,11 +152,33 @@ while gam > 0.00001:
             last1 = x[-1]
             last2 = x[-2]
             last3 = x[-3]
+            last4 = x[-4]
+            last5 = x[-5]
+            last6 = x[-6]
+            last7 = x[-7]
+            last8 = x[-8]
+            last9 = x[-9]
+            last10 = x[-10]
+            last11 = x[-11]
+            last12 = x[-12]
+            last13 = x[-13]
 
-            toAppend = x[:number]
-            toAppend.append(last1)
+            #toAppend = x[:number].tolist()
+            toAppend = [last1]
+            #toAppend.append(last1)
             toAppend.append(last2)
             toAppend.append(last3)
+            toAppend.append(last4)
+            toAppend.append(last5)
+            toAppend.append(last6)
+            toAppend.append(last7)
+            toAppend.append(last8)
+            toAppend.append(last9)
+            toAppend.append(last10)
+            toAppend.append(last11)
+            toAppend.append(last12)
+            toAppend.append(last13)
+
 
             X_train.append(np.asarray(toAppend))
 
@@ -169,9 +191,35 @@ while gam > 0.00001:
         for y in fullTest:
             count = count+1
             test = []
-            lastTest = y[-1]
-            toAppendTest = y[:number]
-            toAppendTest.append(lastTest)
+            last1 = y[-1]
+            last2 = y[-2]
+            last3 = y[-3]
+            last4 = y[-4]
+            last5 = y[-5]
+            last6 = y[-6]
+            last7 = y[-7]
+            last8 = y[-8]
+            last9 = y[-9]
+            last10 = y[-10]
+            last11 = y[-11]
+            last12 = y[-12]
+            last13 = y[-13]
+
+            #toAppendTest = y[:number].tolist()
+            toAppendTest = [last1]
+           # toAppendTest.append(last1)
+            toAppendTest.append(last2)
+            toAppendTest.append(last3)
+            toAppendTest.append(last4)
+            toAppendTest.append(last5)
+            toAppendTest.append(last6)
+            toAppendTest.append(last7)
+            toAppendTest.append(last8)
+            toAppendTest.append(last9)
+            toAppendTest.append(last10)
+            toAppendTest.append(last11)
+            toAppendTest.append(last12)
+            toAppendTest.append(last13)
             test.append(np.asarray(toAppendTest))
             result = clf.predict(test)
             # print (result)

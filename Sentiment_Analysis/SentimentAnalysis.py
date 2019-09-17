@@ -9,6 +9,37 @@ import unicodedata
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import subprocess
+import shlex
+
+#análise do sentistrength via cmd.
+def RateSentiment(sentiString):
+    p = subprocess.Popen(shlex.split("java -jar C:/SentiStrength.jar stdin sentidata C:/SentStrength_Data/"),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+
+    b = bytes(sentiString.replace(" ","+"), 'utf-8')
+    stdout_byte, stderr_text = p.communicate(b)
+    stdout_text = stdout_byte.decode("utf-8")
+    stdout_text = stdout_text.rstrip().replace("\t"," ")
+    return stdout_text #+ " " + sentiString
+
+
+def StanfordSentiment(sentiString):
+    #open a subprocess using shlex to get the command line string into the correct args list format
+    #Modify the location of SentiStrength.jar and D:/SentiStrength_Data/ if necessary
+    p = subprocess.Popen(shlex.split("java -cp '*' -mx5g edu.stanford.nlp.sentiment.SentimentPipeline -stdin"),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    #communicate via stdin the string to be rated. Note that all spaces are replaced with +
+    #Can't send string in Python 3, must send bytes
+    c = bytes(sentiString, 'utf-8')
+    stdout_byte, stderr_text = p.communicate(c)
+    #convert from byte
+    stdout_text = stdout_byte.decode("utf-8")
+    #replace the tab with a space between the positive and negative ratings. e.g. 1    -5 -> 1 -5
+    stdout_text = stdout_text.rstrip().replace("\r\n"," ")
+    if stdout_text == "Positive":
+        return 1
+    elif stdout_text == "Negative":
+        return -1
+    return 0
 
 # Analisa o sentimento do parágrafo inteiro e retorna um valor numérico representando o grau sentimento
 def sentiment_value_per_paragraph(paragraph):

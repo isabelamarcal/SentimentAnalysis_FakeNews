@@ -5,6 +5,7 @@ import Sentiment_Analysis.SentimentAnalysis as sentimentAnalysis
 from textblob import TextBlob
 from sklearn import svm
 import numpy as np
+from nltk.tokenize import sent_tokenize, word_tokenize
 import  json
 
 from tkinter import filedialog
@@ -151,15 +152,15 @@ for registry in data_json:
 
     wordCount.append(aSource.analizeSource(registry['url']))
     print(sentimentTitle)
-    #sentimento do lntk
+    #sentimento do lntk 2
     wordCount.append(sentimentText)
     wordCount.append(sentimentTitle)
 
-    #contagem de emotionWords
+    #contagem de emotionWords 2
     wordCount.append(rank.get_senti_words_count(registry['text']))
     wordCount.append(rank.get_senti_words_count(registry['title']))
 
-    #subjetividade e polaridade
+    #subjetividade e polaridade 4
     testimonialTitle = TextBlob(registry['title'])
     print(testimonialTitle.sentiment)
     wordCount.append(testimonialTitle.sentiment.polarity)
@@ -169,12 +170,35 @@ for registry in data_json:
     wordCount.append(testimonialText.sentiment.polarity)
     wordCount.append(testimonialText.sentiment.subjectivity)
 
+    #sentiStrength 4
+    sentiStrengthTextFull = sentimentAnalysis.RateSentiment(registry['text'])
+    sentiStrengthTextVector = word_tokenize(sentiStrengthTextFull)
+    if len(sentiStrengthTextVector)>0:
+        wordCount.append(sentiStrengthTextVector[0])
+        wordCount.append(sentiStrengthTextVector[1])
+    else:
+        wordCount.append(0)
+        wordCount.append(0)
+    sentiStrengthTitleFull = sentimentAnalysis.RateSentiment(registry['title'])
+    sentiStrengthTitleVector = word_tokenize(sentiStrengthTitleFull)
+    if len(sentiStrengthTitleVector)>0:
+        wordCount.append(sentiStrengthTitleVector[0])
+        wordCount.append(sentiStrengthTitleVector[1])
+    else:
+        wordCount.append(0)
+        wordCount.append(0)
+    #Stanford NLP
+    # nlpTextFull = sentimentAnalysis.StanfordSentiment(registry['text'])
+    # wordCount.append(nlpTextFull)
+    # nlpTitleFull = sentimentAnalysis.StanfordSentiment(registry['title'])
+    # wordCount.append(nlpTitleFull)
 
-    fullTrain.append(np.asarray(wordCount))
+    fullTrain.append(np.asarray(wordCount).tolist())
+    print (len(fullTrain))
 
 
 name_arq = filedialog.asksaveasfilename(**file_opt)
 arq = open(name_arq,'w')
-data = fullTrain
-json.dump(data,arq)
+#data = fullTrain.tolist()
+json.dump(fullTrain,arq)
 arq.close()
